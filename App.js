@@ -5,6 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeSceen';
 import ChildSignIn from './screens/ChildSignIn';
 import ParentSignIn from './screens/ParentSignIn';
+import CreateUser from './screens/CreateUser';
+
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -15,6 +17,7 @@ const App = () => {
           contentStyle: styles.screenBackground}}/>
           <Stack.Screen name="ChildSignIn" component={ChildSignIn} />
           <Stack.Screen name="ParentSignIn" component={ParentSignIn} />
+          <Stack.Screen name="CreateUser" component={CreateUser} />
         </Stack.Navigator>
       </NavigationContainer>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, TextInput } from 'react-native';
 
 const ChildSignIn = () => {
-  const [email, setEmail] = useState('Enter your email');
+  const [email, setEmail] = useState();
   const [password, setPassword] = useState('');
 
   useEffect(() => {
@@ -33,6 +33,7 @@ const ChildSignIn = () => {
       <Text style={styles.title}>Child Sign-In Page</Text>
         <TextInput
           style={styles.input}
+          placeholder='Enter your email'
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -57,7 +58,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    padding : 20
   },
   title: {
     fontSize: 24,
