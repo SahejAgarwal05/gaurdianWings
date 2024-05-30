@@ -1,14 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react'
+import { View, Text, Button, StyleSheet, TextInput } from 'react-native'
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
+import { app } from './firebaseConfig'
+
+const auth = getAuth(app)
 
 const CreateUser = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [user, setUser] = useState(null)
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          setUser(user);
+        });
+    
+        return () => unsubscribe();
+      }, [auth]);
   
-    const handleCreateAccount = () => {
-      console.log('Email:', email);
-      console.log('Password:', password);
-      // Add account creation logic here
+    const handleCreateAccount = async () => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            console.log('User created successfully:', userCredential.user);
+            navigation.navigate('HomeScreen'); // Navigate to the Dashboard screen on success
+          } catch (error) {
+            console.error('Error creating account:', error.message);
+          }
     };
 
     return (
@@ -30,7 +47,7 @@ const CreateUser = () => {
               secureTextEntry
               autoCapitalize="none"
             />
-          <Button title="Create Account" onPress={() => {}} />
+          <Button title="Create Account" onPress={handleCreateAccount} />
         </View>
       );
     }

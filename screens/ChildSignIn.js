@@ -1,9 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, TextInput } from 'react-native';
+import { app } from './firebaseConfig';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 
-const ChildSignIn = () => {
+const auth = getAuth(app)
+
+const ChildSignIn = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const ws = new WebSocket('ws://your-server-url');
@@ -22,10 +35,14 @@ const ChildSignIn = () => {
     };
   }, []);
 
-  const handleSignIn = () => {
-    console.log('Email:', email);
-    console.log('Password:', password);
-    // backend authentication
+  const handleSignIn = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log('User signed in successfully!');
+      navigation.navigate('Dashboard');
+    } catch (error) {
+      console.error('Authentication error:', error.message);
+    }
   };
 
   return (
@@ -47,7 +64,7 @@ const ChildSignIn = () => {
           secureTextEntry
           autoCapitalize="none"
         />
-      <Button title="Sign In" onPress={() => {}} />
+      <Button title="Sign In" onPress={handleSignIn} />
     </View>
   );
 }

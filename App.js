@@ -2,10 +2,11 @@ import React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from './screens/HomeSceen';
+import HomeScreen from './screens/HomeScreen';
 import ChildSignIn from './screens/ChildSignIn';
 import ParentSignIn from './screens/ParentSignIn';
 import CreateUser from './screens/CreateUser';
+import Dashboard from './screens/Dashboard';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ const App = () => {
           <Stack.Screen name="ChildSignIn" component={ChildSignIn} />
           <Stack.Screen name="ParentSignIn" component={ParentSignIn} />
           <Stack.Screen name="CreateUser" component={CreateUser} />
+          <Stack.Screen name="Dashboard" component={Dashboard} />
         </Stack.Navigator>
       </NavigationContainer>
   );
