@@ -29,10 +29,11 @@ const ChildSignIn = ({ navigation }) => {
   const checkUserRole = async (username, password) => {
     const userRef = ref(db, `child/${username}`);
     const snapshot = await get(userRef);
+   // Alert.alert('Account created successfully!');
     if (snapshot.exists()) {
       const userData = snapshot.val();
       if (userData.password === password) {
-        navigation.navigate('ChildDashboard');
+        navigation.navigate('Dashboard');
       } else {
         Alert.alert('Error', 'Invalid password for Child account.');
         auth.signOut();

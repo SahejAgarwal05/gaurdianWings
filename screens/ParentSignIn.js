@@ -32,7 +32,7 @@ const ParentSignIn = ({ navigation }) => {
     if (snapshot.exists()) {
       const userData = snapshot.val();
       if (userData.password === password) {
-        navigation.navigate('ParentDashboard');
+        navigation.navigate('Dashboard');
       } else {
         Alert.alert('Error', 'Invalid password for Parent account.');
         auth.signOut();

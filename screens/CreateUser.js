@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, TextInput, Alert } from 'react-native';
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { app, db } from './firebaseConfig';
-import { ref, set } from 'firebase/database';
+import { ref, get, child, set } from 'firebase/database';
+import { Picker } from '@react-native-picker/picker';
 
 const auth = getAuth(app);
 
@@ -22,7 +23,46 @@ const CreateUser = ({ navigation }) => {
     return () => unsubscribe();
   }, []);
 
+  const checkIfUserExists = async (username, email) => {
+    const dbRef = ref(db);
+    const parentSnapshot = await get(child(dbRef, `parent/${username}`));
+    const childSnapshot = await get(child(dbRef, `child/${username}`));
+
+    let emailExists = false;
+    const parentEmailCheck = await get(child(dbRef, `parent`));
+    const childEmailCheck = await get(child(dbRef, `child`));
+
+    parentEmailCheck.forEach((snapshot) => {
+      if (snapshot.val().email === email) {
+        emailExists = true;
+      }
+    });
+
+    childEmailCheck.forEach((snapshot) => {
+      if (snapshot.val().email === email) {
+        emailExists = true;
+      }
+    });
+
+    return {
+      usernameExists: parentSnapshot.exists() || childSnapshot.exists(),
+      emailExists: emailExists,
+    };
+  };
+
   const handleCreateAccount = async () => {
+    const { usernameExists, emailExists } = await checkIfUserExists(username, email);
+
+    if (usernameExists) {
+      Alert.alert('Error', 'Username already exists. Please choose a different username.');
+      return;
+    }
+
+    if (emailExists) {
+      Alert.alert('Error', 'Email already exists. Please use a different email.');
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const userId = userCredential.user.uid;
@@ -41,7 +81,7 @@ const CreateUser = ({ navigation }) => {
           name,
           email,
           password,
-          parent: "",  // This can be updated to store the parent's username if needed
+          parent: "", // This can be updated to store the parent's username if needed
         });
       }
 
@@ -87,6 +127,15 @@ const CreateUser = ({ navigation }) => {
         secureTextEntry
         autoCapitalize="none"
       />
+      <Text style={styles.label}>Select Role</Text>
+      <Picker
+        selectedValue={role}
+        style={styles.picker}
+        onValueChange={(itemValue) => setRole(itemValue)}
+      >
+        <Picker.Item label="Parent" value="Parent" />
+        <Picker.Item label="Child" value="Child" />
+      </Picker>
       <Button title="Create Account" onPress={handleCreateAccount} />
     </View>
   );
@@ -115,5 +164,15 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     borderRadius: 5,
     backgroundColor: 'white',
+  },
+  label: {
+    width: '100%',
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  picker: {
+    width: '100%',
+    height: 40,
+    marginBottom: 20,
   },
 });
