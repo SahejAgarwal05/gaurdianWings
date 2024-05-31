@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, TextInput} from 'react-native';
-import { app } from './firebaseConfig';
+import { View, Text, Button, StyleSheet, TextInput, Alert } from 'react-native';
+import { app, db } from './firebaseConfig';
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { ref, get } from 'firebase/database';
 
-const auth = getAuth(app)
+const auth = getAuth(app);
 
 const ParentSignIn = ({ navigation }) => {
-  const [email, setEmail] = useState();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
@@ -19,41 +20,48 @@ const ParentSignIn = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://your-server-url');
-
-    ws.onopen = () => {
-      console.log('connected');
-      ws.send('Parent connected');
-    };
-
-    ws.onmessage = (e) => {
-      console.log('Message:', e.data);
-    };
-
+    console.log('Component mounted');
     return () => {
-      ws.close();
+      console.log('Component unmounted');
     };
   }, []);
 
-  const handleSignIn = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log('User signed in successfully!');
-      navigation.navigate('Dashboard');
-    } catch (error) {
-      console.error('Authentication error:', error.message);
+  const checkUserRole = async (username, password) => {
+    const userRef = ref(db, `parent/${username}`);
+    const snapshot = await get(userRef);
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      if (userData.password === password) {
+        navigation.navigate('ParentDashboard');
+      } else {
+        Alert.alert('Error', 'Invalid password for Parent account.');
+        auth.signOut();
+      }
+    } else {
+      Alert.alert('Error', 'Parent account not found.');
+      auth.signOut();
     }
   };
-  
+
+  const handleSignIn = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, `${username}@example.com`, password);
+      console.log('User signed in successfully!');
+      checkUserRole(username, password);
+    } catch (error) {
+      console.error('Authentication error:', error.message);
+      Alert.alert('Error', error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Parent Sign-In Page</Text>
       <TextInput
         style={styles.input}
-        value={email}
-        placeholder='Enter your email'
-        onChangeText={setEmail}
-        keyboardType="email-address"
+        value={username}
+        placeholder='Enter your username'
+        onChangeText={setUsername}
         autoCapitalize="none"
       />
       <TextInput
@@ -67,16 +75,16 @@ const ParentSignIn = ({ navigation }) => {
       <Button title="Sign In" onPress={handleSignIn} />
     </View>
   );
-}
+};
 
-export default ParentSignIn
+export default ParentSignIn;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding : 20
+    padding: 20,
   },
   title: {
     fontSize: 24,
