@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, TextInput, Alert } from 'react-native';
 import { app, db } from './firebaseConfig';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
-import { ref, get } from 'firebase/database';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { ref, get, child } from 'firebase/database';
 
 const auth = getAuth(app);
 
@@ -19,37 +19,23 @@ const ParentSignIn = ({ navigation }) => {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    console.log('Component mounted');
-    return () => {
-      console.log('Component unmounted');
-    };
-  }, []);
-
-  const checkUserRole = async (username, password) => {
-    const userRef = ref(db, `parent/${username}`);
-    const snapshot = await get(userRef);
-    if (snapshot.exists()) {
-      const userData = snapshot.val();
-      if (userData.password === password) {
-        navigation.navigate('Dashboard');
-      } else {
-        Alert.alert('Error', 'Invalid password for Parent account.');
-        auth.signOut();
-      }
-    } else {
-      Alert.alert('Error', 'Parent account not found.');
-      auth.signOut();
-    }
-  };
-
   const handleSignIn = async () => {
     try {
-      await signInWithEmailAndPassword(auth, `${username}@example.com`, password);
-      console.log('User signed in successfully!');
-      checkUserRole(username, password);
+      const userRef = ref(db, `parent/${username}`);
+      const snapshot = await get(userRef);
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        if (userData.password === password) {
+          console.log('User signed in successfully!');
+          navigation.navigate('Dashboard');
+        } else {
+          Alert.alert('Error', 'Invalid password for Parent account.');
+        }
+      } else {
+        Alert.alert('Error', 'Parent account not found.');
+      }
     } catch (error) {
-      console.error('Authentication error:', error.message);
+      console.error('Error signing in:', error.message);
       Alert.alert('Error', error.message);
     }
   };

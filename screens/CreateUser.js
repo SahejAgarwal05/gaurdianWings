@@ -89,8 +89,12 @@ const CreateUser = ({ navigation }) => {
       Alert.alert('Account created successfully!', `Role: ${role}`);
       navigation.navigate('HomeScreen');
     } catch (error) {
-      console.error('Error creating account:', error.message);
-      Alert.alert('Error', error.message);
+      if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('Error', 'Email already in use. Please use a different email.');
+      } else {
+        console.error('Error creating account:', error.message);
+        Alert.alert('Error', error.message);
+      }
     }
   };
 
