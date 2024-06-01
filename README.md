@@ -10,8 +10,6 @@ With the increase in usage of digital devices by younger children and lesser sup
 
 ## Features
 
-- **Real-Time Location Tracking**: Monitor your location in real-time and share it with trusted contacts.
-- **Emergency Alerts**: Send quick emergency alerts to pre-selected contacts with your location details.
 - **Automated Notifications**: Receive automated notifications in case of potential threats or emergencies.
 - **User-Friendly Interface**: Easy-to-use interface designed for quick access to essential features.
 - **Secure Data Handling**: Ensures user data privacy and security through encrypted communication and data storage.
