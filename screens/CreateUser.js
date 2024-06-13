@@ -51,7 +51,11 @@ const CreateUser = ({ navigation }) => {
   };
 
   const handleCreateAccount = async () => {
-    const { usernameExists, emailExists } = await checkIfUserExists(username, email);
+    const trimmedName = name.trim();
+    const trimmedUsername = username.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    const { usernameExists, emailExists } = await checkIfUserExists(trimmedUsername, trimmedEmail);
 
     if (usernameExists) {
       Alert.alert('Error', 'Username already exists. Please choose a different username.');
@@ -64,23 +68,23 @@ const CreateUser = ({ navigation }) => {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
       const userId = userCredential.user.uid;
 
       if (role === 'Parent') {
-        const userRef = ref(db, `parent/${username}`);
+        const userRef = ref(db, `parent/${trimmedUsername}`);
         await set(userRef, {
-          name,
-          email,
-          password,
+          name: trimmedName,
+          email: trimmedEmail,
+          password: trimmedPassword,
           child: {},
         });
       } else if (role === 'Child') {
-        const userRef = ref(db, `child/${username}`);
+        const userRef = ref(db, `child/${trimmedUsername}`);
         await set(userRef, {
-          name,
-          email,
-          password,
+          name: trimmedName,
+          email: trimmedEmail,
+          password: trimmedPassword,
           parent: "", // This can be updated to store the parent's username if needed
         });
       }

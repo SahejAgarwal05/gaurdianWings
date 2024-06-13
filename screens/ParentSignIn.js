@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, TextInput, Alert } from 'react-native';
-import { app, db } from './firebaseConfig';
+import { app, db } from './firebaseConfig.js';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { ref, get, child } from 'firebase/database';
+import { ref, get } from 'firebase/database';
 
 const auth = getAuth(app);
 
@@ -21,13 +21,15 @@ const ParentSignIn = ({ navigation }) => {
 
   const handleSignIn = async () => {
     try {
-      const userRef = ref(db, `parent/${username}`);
+      const trimmedUsername = username.trim();
+      const trimmedPassword = password.trim();
+      const userRef = ref(db, `parent/${trimmedUsername}`);
       const snapshot = await get(userRef);
       if (snapshot.exists()) {
         const userData = snapshot.val();
-        if (userData.password === password) {
+        if (userData.password === trimmedPassword) {
           console.log('User signed in successfully!');
-          navigation.navigate('Dashboard');
+          navigation.navigate('ParentDashboard', { userName: trimmedUsername });
         } else {
           Alert.alert('Error', 'Invalid password for Parent account.');
         }
