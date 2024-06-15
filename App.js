@@ -8,7 +8,6 @@ import ParentSignIn from './screens/ParentSignIn';
 import CreateUser from './screens/CreateUser';
 import ParentDashboard from './screens/ParentDashboard';
 import ChildDashboard from './screens/ChildDashboard';
-import ChildScreen from './screens/ChildScreen'; // Assuming this is also needed
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +21,6 @@ const App = () => {
           <Stack.Screen name="CreateUser" component={CreateUser} />
           <Stack.Screen name="ParentDashboard" component={ParentDashboard} />
           <Stack.Screen name="ChildDashboard" component={ChildDashboard} />
-          <Stack.Screen name="ChildScreen" component={ChildScreen} /> 
         </Stack.Navigator>
       </NavigationContainer>
   );
