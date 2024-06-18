@@ -3,7 +3,7 @@ import { Button, View, StyleSheet, Text } from 'react-native';
 import { ref, get } from 'firebase/database';
 import { db } from './firebaseConfig';
 
-const ParentSettings = ({ navigation, username }) => {
+const ParentSettings = ({ navigation, username, parentNavigation }) => {
   const [children, setChildren] = useState([]);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const ParentSettings = ({ navigation, username }) => {
   }, [username]);
 
   const handleAddChild = () => {
-    navigation.navigate('AddChildScreen', { username });
+    parentNavigation.navigate('AddChildScreen', { username });
   };
 
   return (

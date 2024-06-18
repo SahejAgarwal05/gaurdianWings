@@ -6,14 +6,14 @@ import ParentTodoList from './ParentTodoList';
 
 const Drawer = createDrawerNavigator();
 
-const ParentDashboard = ({ route }) => {
+const ParentDashboard = ({ route, navigation }) => {
   const { username } = route.params;
 
   return (
     <NavigationContainer independent={true}>
       <Drawer.Navigator initialRouteName="ParentHome">
         <Drawer.Screen name="Settings">
-          {(props) => <ParentSettings {...props} username={username} />}
+          {(props) => <ParentSettings {...props} username={username} parentNavigation={navigation} />}
         </Drawer.Screen>
       </Drawer.Navigator>
     </NavigationContainer>
@@ -21,4 +21,3 @@ const ParentDashboard = ({ route }) => {
 }
 
 export default ParentDashboard;
-
