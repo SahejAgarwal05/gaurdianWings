@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Button, View, StyleSheet, Text } from 'react-native';
 import { ref, get } from 'firebase/database';
 import { db } from './firebaseConfig';
+import { useIsFocused } from '@react-navigation/native';
 
 const ParentSettings = ({ navigation, username, parentNavigation }) => {
   const [children, setChildren] = useState([]);
+  const isFocused = useIsFocused(); // Hook to detect focus
 
   useEffect(() => {
     if (!username) {
@@ -28,8 +30,10 @@ const ParentSettings = ({ navigation, username, parentNavigation }) => {
       }
     };
 
-    fetchChildren();
-  }, [username]);
+    if (isFocused) {
+      fetchChildren(); // Fetch children when the screen is focused
+    }
+  }, [isFocused, username]);
 
   const handleAddChild = () => {
     parentNavigation.navigate('AddChildScreen', { username });

@@ -3,7 +3,8 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { ref, set, get } from 'firebase/database';
 import { db } from './firebaseConfig';
 
-const AddChildScreen = ({ navigation, parentUsername }) => {
+const AddChildScreen = ({ route, navigation }) => {
+  const { username: parentUsername } = route.params; // Get parent's username from navigation params
   const [childUsername, setChildUsername] = useState('');
   const [childPassword, setChildPassword] = useState('');
 
@@ -27,7 +28,7 @@ const AddChildScreen = ({ navigation, parentUsername }) => {
           return;
         }
 
-        if (childData.parent) {
+        if (childData.parent && childData.parent !== "") {
           if (childData.parent === parentUsername) {
             Alert.alert('Error', 'This child is already assigned to you.');
           } else {
@@ -41,10 +42,11 @@ const AddChildScreen = ({ navigation, parentUsername }) => {
 
         // Add child to parent's children list
         const parentChildRef = ref(db, `parent/${parentUsername}/Children/${trimmedChildUsername}`);
-        await set(parentChildRef, {});
+        await set(parentChildRef, true);
 
         Alert.alert('Success', 'Child added successfully!');
         navigation.goBack();
+        navigation.navigate('ParentDashboard', { username: parentUsername });
       } else {
         Alert.alert('Error', 'Child account does not exist.');
       }
