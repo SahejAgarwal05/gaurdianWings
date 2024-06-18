@@ -8,8 +8,8 @@ const ParentSettings = ({ navigation, username }) => {
 
   useEffect(() => {
     if (!username) {
-        console.error('Username is not defined');
-        return;
+      console.error('Username is not defined');
+      return;
     }
 
     const fetchChildren = async () => {
@@ -19,6 +19,9 @@ const ParentSettings = ({ navigation, username }) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
           setChildren(Object.keys(data)); // Getting usernames instead of values
+          console.log('Fetched children:', Object.keys(data)); // Debugging log
+        } else {
+          console.log('No children found for this parent.'); // Debugging log
         }
       } catch (error) {
         console.error('Error fetching children:', error.message);
@@ -29,7 +32,6 @@ const ParentSettings = ({ navigation, username }) => {
   }, [username]);
 
   const handleAddChild = () => {
-    // Navigate to AddChildScreen, passing the parent's username
     navigation.navigate('AddChildScreen', { username });
   };
 
@@ -40,7 +42,7 @@ const ParentSettings = ({ navigation, username }) => {
         children.map((childUsername, index) => (
           <Button
             key={index}
-            title={childUsername}
+            title={childUsername} // Preserve original case
             onPress={() => navigation.navigate('ChildScreen', { parentUsername: username, childUsername })}
           />
         ))

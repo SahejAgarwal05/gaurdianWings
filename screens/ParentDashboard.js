@@ -15,9 +15,6 @@ const ParentDashboard = ({ route }) => {
         <Drawer.Screen name="Settings">
           {(props) => <ParentSettings {...props} username={username} />}
         </Drawer.Screen>
-        <Drawer.Screen name="To-do List">
-          {(props) => <ParentTodoList {...props} username={username} />}
-        </Drawer.Screen>
       </Drawer.Navigator>
     </NavigationContainer>
   );
