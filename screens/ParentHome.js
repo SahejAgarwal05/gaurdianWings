@@ -4,7 +4,7 @@ import { ref, get } from 'firebase/database';
 import { db } from './firebaseConfig';
 import { useIsFocused } from '@react-navigation/native';
 
-const ParentSettings = ({ route, navigation, parentNavigation, parentUsername }) => {
+const ParentHome = ({ route, navigation, parentUsername }) => {
   const [children, setChildren] = useState([]);
   const isFocused = useIsFocused();
 
@@ -35,13 +35,9 @@ const ParentSettings = ({ route, navigation, parentNavigation, parentUsername })
     }
   }, [isFocused, parentUsername]);
 
-  const handleAddChild = () => {
-    parentNavigation.navigate('AddChildScreen', { parentUsername });
-  };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Parent Dashboard</Text>
+      <Text style={styles.username}>Welcome {parentUsername}</Text>
       {children.length > 0 ? (
         children.map((childUsername, index) => (
           <Button
@@ -53,16 +49,11 @@ const ParentSettings = ({ route, navigation, parentNavigation, parentUsername })
       ) : (
         <Text>No children found.</Text>
       )}
-      <Button
-        title="Add Child"
-        onPress={handleAddChild}
-        style={styles.addButton}
-      />
     </View>
   );
 };
 
-export default ParentSettings;
+export default ParentHome;
 
 const styles = StyleSheet.create({
   container: {
@@ -71,12 +62,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  title: {
+  username: {
     fontSize: 24,
     marginBottom: 20,
     textAlign: 'center',
-  },
-  addButton: {
-    marginTop: 20,
   },
 });

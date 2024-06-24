@@ -29,7 +29,7 @@ const ParentSignIn = ({ navigation }) => {
         const userData = snapshot.val();
         if (userData.password === trimmedPassword) {
           console.log('User signed in successfully!');
-          navigation.navigate('ParentDashboard', { username: trimmedUsername });
+          navigation.navigate('ParentDashboard', { parentUsername: trimmedUsername });
         } else {
           Alert.alert('Error', 'Invalid password for Parent account.');
         }
@@ -90,3 +90,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
 });
+

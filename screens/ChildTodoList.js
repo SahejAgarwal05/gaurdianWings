@@ -1,27 +1,71 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
+import { ref, get, update } from 'firebase/database';
+import { db } from './firebaseConfig';
 
-const ChildScreen = ({ route }) => {
-  const { username } = route.params;
+const ChildTodoList = ({ navigation, username }) => {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const tasksRef = ref(db, `parent/${username}/Tasks`);
+      const snapshot = await get(tasksRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const tasksArray = Object.keys(data).map(key => ({
+          id: key,
+          ...data[key],
+        }));
+        setTasks(tasksArray);
+      }
+    };
+
+    fetchTasks();
+  }, [username]);
+
+  const handleCompleteTask = async (taskId) => {
+    const taskRef = ref(db, `parent/${username}/Tasks/${taskId}`);
+    await update(taskRef, { status: 'Completed' });
+    setTasks(tasks.map(task => (task.id === taskId ? { ...task, status: 'Completed' } : task)));
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Child Username: {username}</Text>
+      <Text style={styles.title}>To-Do List</Text>
+      <FlatList
+        data={tasks}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.task}>
+            <Text>{item.task}</Text>
+            <Text>Deadline: {item.deadline}</Text>
+            <Text>Reward: {item.reward} hours</Text>
+            {item.status !== 'Completed' && (
+              <Button title="Mark as Completed" onPress={() => handleCompleteTask(item.id)} />
+            )}
+          </View>
+        )}
+      />
     </View>
   );
 };
 
-export default ChildScreen;
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
-    textAlign: 'center',
+  },
+  task: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
   },
 });
+
+export default ChildTodoList;
+

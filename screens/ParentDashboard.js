@@ -2,18 +2,21 @@ import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import ParentSettings from './ParentSettings';
-import ParentTodoList from './ParentTodoList';
+import ParentHome from './ParentHome'; // New component to display children
 
 const Drawer = createDrawerNavigator();
 
 const ParentDashboard = ({ route, navigation }) => {
-  const { username } = route.params;
+  const { parentUsername } = route.params;
 
   return (
     <NavigationContainer independent={true}>
-      <Drawer.Navigator initialRouteName="ParentHome">
+      <Drawer.Navigator initialRouteName="Home">
+        <Drawer.Screen name="Home">
+          {(props) => <ParentHome {...props} parentUsername={parentUsername} parentNavigation={navigation} />}
+        </Drawer.Screen>
         <Drawer.Screen name="Settings">
-          {(props) => <ParentSettings {...props} username={username} parentNavigation={navigation} />}
+          {(props) => <ParentSettings {...props} parentUsername={parentUsername} parentNavigation={navigation} />}
         </Drawer.Screen>
       </Drawer.Navigator>
     </NavigationContainer>
