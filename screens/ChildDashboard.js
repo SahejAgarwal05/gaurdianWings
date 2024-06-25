@@ -11,12 +11,12 @@ const ChildDashboard = ({ route }) => {
 
   return (
     <NavigationContainer independent={true}>
-      <Drawer.Navigator initialRouteName="ParentHome">
-        <Drawer.Screen name="Settings">
-          {(props) => <ChildSettings {...props} username={username} />}
-        </Drawer.Screen>
+      <Drawer.Navigator initialRouteName="Home">
         <Drawer.Screen name="Home">
           {(props) => <ChildTodoList {...props} username={username} />}
+        </Drawer.Screen>
+        <Drawer.Screen name="Settings">
+          {(props) => <ChildSettings {...props} username={username} />}
         </Drawer.Screen>
       </Drawer.Navigator>
     </NavigationContainer>

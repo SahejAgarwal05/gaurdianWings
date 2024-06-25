@@ -3,7 +3,7 @@ import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
 import { ref, get, update } from 'firebase/database';
 import { db } from './firebaseConfig';
 
-const ChildTodoList = ({ navigation, username }) => {
+const ChildTodoList = ({ username }) => {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const ChildTodoList = ({ navigation, username }) => {
   }, [username]);
 
   const handleCompleteTask = async (taskId) => {
-    const taskRef = ref(db, `parent/${username}/Tasks/${taskId}`);
+    const taskRef = ref(db, `child/${username}/Tasks/${taskId}`);
     await update(taskRef, { status: 'Completed' });
     setTasks(tasks.map(task => (task.id === taskId ? { ...task, status: 'Completed' } : task)));
   };
@@ -40,6 +40,7 @@ const ChildTodoList = ({ navigation, username }) => {
             <Text>{item.task}</Text>
             <Text>Deadline: {item.deadline}</Text>
             <Text>Reward: {item.reward} hours</Text>
+            <Text>Status: {item.status}</Text>
             {item.status !== 'Completed' && (
               <Button title="Mark as Completed" onPress={() => handleCompleteTask(item.id)} />
             )}
@@ -68,4 +69,3 @@ const styles = StyleSheet.create({
 });
 
 export default ChildTodoList;
-

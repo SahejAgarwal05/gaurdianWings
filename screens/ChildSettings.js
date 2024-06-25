@@ -3,14 +3,14 @@ import { Button, View, StyleSheet, Text } from 'react-native';
 import { ref, get } from 'firebase/database';
 import { app, db } from './firebaseConfig';
 
-const ChildSettings = ({ navigation, username }) => {
+const ChildSettings = ({ username }) => {
   const [parent, setParent] = useState(null);
 
   useEffect(() => {
     if (!username) {
       console.error('Username is not defined');
       return;
-  }
+    }
 
     const fetchParent = async () => {
       try {

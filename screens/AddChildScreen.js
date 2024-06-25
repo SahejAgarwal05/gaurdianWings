@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { ref, set, get, update, child } from 'firebase/database';
+import { ref, set, get } from 'firebase/database';
 import { db } from './firebaseConfig';
 
 const AddChildScreen = ({ route, navigation }) => {
-  const parentUsername  = route.params.username; // Get parent's username from navigation params
+  const { username: parentUsername } = route.params; // Get parent's username from navigation params
   const [childUsername, setChildUsername] = useState('');
   const [childPassword, setChildPassword] = useState('');
 
@@ -22,30 +22,31 @@ const AddChildScreen = ({ route, navigation }) => {
       const childSnapshot = await get(childRef);
 
       if (childSnapshot.exists()) {
-        let childData = childSnapshot.val();
+        const childData = childSnapshot.val();
         if (childData.password !== trimmedChildPassword) {
           Alert.alert('Error', 'Incorrect password for the child account.');
           return;
         }
-        if (!childData.hasOwnProperty('parent') || childData.parent === ' n ') {
-          childData.parent = parentUsername;
-          // Update child's parent field
-          set (childRef, childData);
-        
-          // Add child to parent's children list
-          const parentChildRef = ref(db, `parent/${parentUsername}/Children/${trimmedChildUsername}`);
-          await set(parentChildRef, true);
 
-          Alert.alert('Success', 'Child added successfully!');
-          navigation.goBack();
-          navigation.navigate('ParentDashboard', { username: parentUsername });
-        } else {
+        if (childData.parent && childData.parent !== "") {
           if (childData.parent === parentUsername) {
             Alert.alert('Error', 'This child is already assigned to you.');
           } else {
-            Alert.alert('Error', `This child is already assigned to another parent`);
+            Alert.alert('Error', `This child is already assigned to another parent: ${childData.parent}.`);
           }
+          return;
         }
+
+        // Update child's parent field
+        await set(ref(db, `child/${trimmedChildUsername}/parent`), parentUsername);
+
+        // Add child to parent's children list
+        const parentChildRef = ref(db, `parent/${parentUsername}/Children/${trimmedChildUsername}`);
+        await set(parentChildRef, true);
+
+        Alert.alert('Success', 'Child added successfully!');
+        navigation.goBack();
+        navigation.navigate('ParentDashboard', { username: parentUsername });
       } else {
         Alert.alert('Error', 'Child account does not exist.');
       }
