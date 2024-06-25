@@ -16,17 +16,15 @@ const ParentSettings = ({ route, navigation, parentNavigation, parentUsername })
 
     const fetchChildren = async () => {
       try {
-        const userRef = ref(db, `parent/${parentUsername}/Children`);
-        const snapshot = await get(userRef);
+        const childrenRef = ref(db, `users/${parentUsername}/children`);
+        const snapshot = await get(childrenRef);
         if (snapshot.exists()) {
-          const data = snapshot.val();
-          setChildren(Object.keys(data));
-          console.log('Fetched children:', Object.keys(data));
+          setChildren(Object.values(snapshot.val()));
         } else {
-          console.log('No children found for this parent.');
+          console.log('No children found');
         }
       } catch (error) {
-        console.error('Error fetching children:', error.message);
+        console.error('Error fetching children:', error);
       }
     };
 
@@ -36,27 +34,28 @@ const ParentSettings = ({ route, navigation, parentNavigation, parentUsername })
   }, [isFocused, parentUsername]);
 
   const handleAddChild = () => {
-    parentNavigation.navigate('AddChildScreen', { parentUsername });
+    parentNavigation.navigate('AddChildScreen', { username : parentUsername });
+  };
+
+  const handleRemoveChild = () => {
+    parentNavigation.navigate('RemoveChildScreen', { username : parentUsername });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Parent Dashboard</Text>
-      {children.length > 0 ? (
-        children.map((childUsername, index) => (
-          <Button
-            key={index}
-            title={childUsername}
-            onPress={() => navigation.navigate('ParentTodoList', { parentUsername, childUsername })}
-          />
-        ))
-      ) : (
-        <Text>No children found.</Text>
-      )}
+      <Text style={styles.title}>Settings</Text>
+      {children.map((child, index) => (
+        <Text key={index}>{child.name}</Text>
+      ))}
       <Button
         title="Add Child"
         onPress={handleAddChild}
         style={styles.addButton}
+      />
+      <Button
+        title="Remove Child"
+        onPress={handleRemoveChild}
+        style={styles.removeButton}
       />
     </View>
   );
@@ -77,6 +76,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   addButton: {
+    marginTop: 20,
+  },
+  removeButton: {
     marginTop: 20,
   },
 });

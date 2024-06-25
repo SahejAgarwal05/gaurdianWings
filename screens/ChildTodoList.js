@@ -8,7 +8,7 @@ const ChildTodoList = ({ navigation, username }) => {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const tasksRef = ref(db, `parent/${username}/Tasks`);
+      const tasksRef = ref(db, `child/${username}/Tasks`);
       const snapshot = await get(tasksRef);
       if (snapshot.exists()) {
         const data = snapshot.val();

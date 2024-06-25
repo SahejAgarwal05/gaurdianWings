@@ -11,7 +11,7 @@ const ParentTodoList = ({ route }) => {
 
   const handleAddTask = async () => {
     if (task && reward && deadline) {
-      const tasksRef = ref(db, `parent/${parentUsername}/Children/${childUsername}/Tasks`);
+      const tasksRef = ref(db, `child/${childUsername}/Tasks`);
       await push(tasksRef, {
         task,
         reward,
@@ -21,6 +21,7 @@ const ParentTodoList = ({ route }) => {
       setTask('');
       setReward('');
       setDeadline('');
+      Alert.alert('Success', 'Task added successfully!');
     } else {
       Alert.alert('Error', 'All fields are required.');
     }

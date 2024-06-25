@@ -7,7 +7,7 @@ import ParentHome from './ParentHome'; // New component to display children
 const Drawer = createDrawerNavigator();
 
 const ParentDashboard = ({ route, navigation }) => {
-  const { parentUsername } = route.params;
+  const parentUsername  = route.params.username;
 
   return (
     <NavigationContainer independent={true}>

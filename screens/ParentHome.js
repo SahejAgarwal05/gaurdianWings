@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button, View, StyleSheet, Text } from 'react-native';
-import { ref, get } from 'firebase/database';
+import { ref, get, onValue } from 'firebase/database';
 import { db } from './firebaseConfig';
 import { useIsFocused } from '@react-navigation/native';
 
-const ParentHome = ({ route, navigation, parentUsername }) => {
+const ParentHome = ({ route, navigation, parentNavigation, parentUsername }) => {
+  console.log(parentNavigation);
   const [children, setChildren] = useState([]);
   const isFocused = useIsFocused();
 
@@ -14,10 +15,9 @@ const ParentHome = ({ route, navigation, parentUsername }) => {
       return;
     }
 
-    const fetchChildren = async () => {
-      try {
-        const userRef = ref(db, `parent/${parentUsername}/Children`);
-        const snapshot = await get(userRef);
+    const fetchChildren = () => {
+      const userRef = ref(db, `parent/${parentUsername}/Children`);
+      onValue(userRef, (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
           setChildren(Object.keys(data));
@@ -25,9 +25,9 @@ const ParentHome = ({ route, navigation, parentUsername }) => {
         } else {
           console.log('No children found for this parent.');
         }
-      } catch (error) {
+      }, (error) => {
         console.error('Error fetching children:', error.message);
-      }
+      });
     };
 
     if (isFocused) {
@@ -43,7 +43,7 @@ const ParentHome = ({ route, navigation, parentUsername }) => {
           <Button
             key={index}
             title={childUsername}
-            onPress={() => navigation.navigate('ParentTodoList', { parentUsername, childUsername })}
+            onPress={() => parentNavigation.navigate('ParentTodoList', { parentUsername, childUsername })}
           />
         ))
       ) : (

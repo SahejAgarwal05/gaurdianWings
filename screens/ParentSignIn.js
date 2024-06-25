@@ -29,7 +29,7 @@ const ParentSignIn = ({ navigation }) => {
         const userData = snapshot.val();
         if (userData.password === trimmedPassword) {
           console.log('User signed in successfully!');
-          navigation.navigate('ParentDashboard', { parentUsername: trimmedUsername });
+          navigation.navigate('ParentDashboard', { username: trimmedUsername, navigation : navigation });
         } else {
           Alert.alert('Error', 'Invalid password for Parent account.');
         }

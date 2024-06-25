@@ -85,13 +85,13 @@ const CreateUser = ({ navigation }) => {
           name: trimmedName,
           email: trimmedEmail,
           password: trimmedPassword,
-          parent: "", // This can be updated to store the parent's username if needed
+          parent: " n ", // This can be updated to store the parent's username if needed
         });
       }
 
       console.log('User created successfully:', userCredential.user);
       Alert.alert('Account created successfully!', `Role: ${role}`);
-      navigation.navigate('HomeScreen');
+      navigation.navigate('Home');
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
         Alert.alert('Error', 'Email already in use. Please use a different email.');
