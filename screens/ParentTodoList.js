@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity } from 'react-native'; // Import TouchableOpacity
-import { ref, push, onValue, remove } from 'firebase/database';
+import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity, Image } from 'react-native';
+import { ref, push, onValue, update, remove } from 'firebase/database';
 import { db } from './firebaseConfig';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -67,6 +67,13 @@ const ParentTodoList = ({ route }) => {
     Alert.alert('Success', 'Task deleted successfully!');
   };
 
+  const handleVerifyTask = async (taskId) => {
+    const taskRef = ref(db, `child/${childUsername}/Tasks/${taskId}`);
+    await update(taskRef, { status: 'Completed' });
+    setTasks(tasks.map(task => (task.id === taskId ? { ...task, status: 'Completed' } : task)));
+    Alert.alert('Success', 'Task marked as completed!');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Assign New Task to {childUsername}</Text>
@@ -105,8 +112,12 @@ const ParentTodoList = ({ route }) => {
             <Text>Deadline: {item.deadline}</Text>
             <Text>Reward: {item.reward} hours</Text>
             <Text>Status: {item.status}</Text>
+            {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.image} />}
+            {item.status === 'Pending Verification' && (
+              <Button title="Verify Task" onPress={() => handleVerifyTask(item.id)} />
+            )}
             {item.status === 'Completed' && (
-              <Button title="Delete" onPress={() => handleDeleteTask(item.id)} />
+              <Button title="Delete Task" onPress={() => handleDeleteTask(item.id)} />
             )}
           </View>
         )}
@@ -143,7 +154,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     borderRadius: 5,
-    backgroundColor: 'lightgray',
+    alignItems: 'center',
   },
   dateButtonText: {
     fontSize: 16,
@@ -154,6 +165,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    marginTop: 10,
   },
   scrollContent: {
     paddingBottom: 20,
