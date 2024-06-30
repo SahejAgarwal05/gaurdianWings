@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, FlatList, Image, Alert } from 'react-native';
 import { ref, get, update } from 'firebase/database';
-import { db, storage, auth } from './firebaseConfig';
+import { db, storage } from './firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { onAuthStateChanged } from 'firebase/auth';
 
 const ChildTodoList = ({ username }) => {
   const [tasks, setTasks] = useState([]);
   const [hasPermission, setHasPermission] = useState(null);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -40,20 +38,7 @@ const ChildTodoList = ({ username }) => {
     requestPermission();
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
   const handleUploadImage = async (taskId) => {
-    if (!user) {
-      Alert.alert('Error', 'You need to be authenticated to upload images.');
-      return;
-    }
-
     if (hasPermission === null) {
       Alert.alert('Error', 'Permission to access media library is not granted.');
       return;

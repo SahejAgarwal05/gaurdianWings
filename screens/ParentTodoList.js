@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity, Image, Modal, Pressable } from 'react-native';
 import { ref, push, onValue, update, remove } from 'firebase/database';
 import { db } from './firebaseConfig';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -11,6 +11,8 @@ const ParentTodoList = ({ route }) => {
   const [deadline, setDeadline] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const fetchTasks = () => {
@@ -74,6 +76,11 @@ const ParentTodoList = ({ route }) => {
     Alert.alert('Success', 'Task marked as completed!');
   };
 
+  const handleImagePress = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setModalVisible(true);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Assign New Task to {childUsername}</Text>
@@ -112,17 +119,34 @@ const ParentTodoList = ({ route }) => {
             <Text>Deadline: {item.deadline}</Text>
             <Text>Reward: {item.reward} hours</Text>
             <Text>Status: {item.status}</Text>
-            {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.image} />}
-            {item.status === 'Pending Verification' && (
+            {item.imageUrl && (
+              <TouchableOpacity onPress={() => handleImagePress(item.imageUrl)}>
+                <Image source={{ uri: item.imageUrl }} style={styles.image} />
+              </TouchableOpacity>
+            )}
+            {item.status === 'Pending' && (
               <Button title="Verify Task" onPress={() => handleVerifyTask(item.id)} />
             )}
-            {item.status === 'Completed' && (
-              <Button title="Delete Task" onPress={() => handleDeleteTask(item.id)} />
-            )}
+            <Button title="Delete Task" onPress={() => handleDeleteTask(item.id)} />
           </View>
         )}
         contentContainerStyle={styles.scrollContent}
       />
+
+      {selectedImage && (
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <Image source={{ uri: selectedImage }} style={styles.fullImage} />
+            <Pressable style={styles.closeButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </Pressable>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 };
@@ -173,6 +197,25 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 20,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.8)',
+  },
+  fullImage: {
+    width: '80%',
+    height: '80%',
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    fontSize: 18,
   },
 });
 
