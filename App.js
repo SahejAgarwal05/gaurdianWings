@@ -11,7 +11,7 @@ import ChildDashboard from './screens/ChildDashboard';
 import AddChildScreen from './screens/AddChildScreen';
 import ParentTodoList from './screens/ParentTodoList'; 
 import RemoveChildScreen from './screens/RemoveChild';
-//import ParentHome from './screens/ParentHome'; // Import ParentHome
+import Browser from './screens/ChildBrowser';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +33,7 @@ const App = () => {
         <Stack.Screen name="ChildDashboard" component={ChildDashboard} />
         <Stack.Screen name="ParentTodoList" component={ParentTodoList} />
         <Stack.Screen name="RemoveChildScreen" component={RemoveChildScreen} />
+        <Stack.Screen name="Browser" component={Browser} />
       </Stack.Navigator>
     </NavigationContainer>
   );

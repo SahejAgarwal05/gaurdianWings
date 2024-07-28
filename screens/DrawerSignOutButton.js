@@ -22,7 +22,6 @@ const DrawerSignOutButton = (props) => {
       console.log('Signing out...');
       const user = JSON.parse(await AsyncStorage.getItem('user'));
       setSavedUser(user);
-      console.log('User:', user);
       if (user.type === 'child') {
         const parentUsernameRef = ref(database, `child/${user.username}/parent`);
         const parentUsernameSnapshot = await get(parentUsernameRef);
@@ -51,7 +50,7 @@ const DrawerSignOutButton = (props) => {
           console.error('Parent username not found.');
         }
       } else {
-        console.log('Parent user signed out.'); 
+
         await AsyncStorage.clear();
         await signOut(auth);
         props.navigation.dispatch(

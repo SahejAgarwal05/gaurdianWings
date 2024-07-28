@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { ref, onValue, update, get } from 'firebase/database';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { ref, onValue, get } from 'firebase/database';
 import { db } from './firebaseConfig';
 import { PieChart } from 'react-native-chart-kit';
+import { useNavigation } from '@react-navigation/native';
 
 const ChildHome = ({ username }) => {
   const [tasksCount, setTasksCount] = useState({ completed: 0, pending: 0 });
   const [availableTime, setAvailableTime] = useState(0);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchTasksCount = () => {
@@ -21,16 +23,14 @@ const ChildHome = ({ username }) => {
           const totalReward = completedTasks.reduce((total, task) => total + (parseFloat(task.reward) || 0), 0);
           setTasksCount({ completed, pending });
 
-          const timeRef = ref(db, `child/${username}/availableTime`);
+          const timeRef = ref(db, `child/${username}/`);
           get(timeRef).then((snapshot) => {
             if (snapshot.exists()) {
-              const currentAvailableTime = parseFloat(snapshot.val()) || 0;
-              const newAvailableTime = currentAvailableTime + totalReward;
+              const currentAvailableTime = parseFloat(snapshot.val().availableTime) || 0;
+              const newAvailableTime = totalReward;
               setAvailableTime(newAvailableTime);
-              update(timeRef, { availableTime: newAvailableTime });
             } else {
               setAvailableTime(totalReward);
-              update(timeRef, { availableTime: totalReward });
             }
           });
         }
@@ -82,9 +82,15 @@ const ChildHome = ({ username }) => {
         absolute
       />
       <View style={styles.screenTimeContainer}>
-        <Text style={styles.screenTimeTitle}>Available Screen Time</Text>
+        <Text style={styles.screenTimeTitle}>Total Time Earned Till Date</Text>
         <Text style={styles.screenTimeValue}>{availableTime} hours</Text>
       </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Browser', { 'username': username })}
+      >
+        <Text style={styles.buttonText}>Go to Browser</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -111,6 +117,28 @@ const styles = StyleSheet.create({
   screenTimeValue: {
     fontSize: 18,
     color: '#333',
+  },
+  button: {
+    backgroundColor: '#ffffff', // White background to match the design
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center', // Center button horizontally
+    marginTop: 30, // Ensure there's spacing above the button
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 1, // Shadow for Android
+  },
+  buttonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

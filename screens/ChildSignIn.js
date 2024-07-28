@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, Alert, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, Alert, Image, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { app, db } from './firebaseConfig';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { ref, get } from 'firebase/database';
@@ -46,31 +46,38 @@ const ChildSignIn = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-        <Image
-        source={require('../images/GuardianWingslogo.png')}
-        style={styles.logo}
-      />
-      <Text style={styles.title}>Child Sign-In Page</Text>
-      <TextInput
-        style={styles.input}
-        value={username}
-        placeholder='Enter your username'
-        onChangeText={setUsername}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-      />
-      <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-        <Text style={styles.buttonText}>Sign In</Text>
-      </TouchableOpacity>
-    </View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.innerContainer}>
+        <View style={styles.inner}>
+          <Image
+            source={require('../images/GuardianWingslogo.png')}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>Child Sign-In Page</Text>
+          <TextInput
+            style={styles.input}
+            value={username}
+            placeholder='Enter your username'
+            onChangeText={setUsername}
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+          />
+          <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -79,19 +86,27 @@ export default ChildSignIn;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    pading: 20,
     backgroundColor: '#fefaf8',
   },
+  innerContainer: {
+    flexGrow: 1,
+    justifyContent: 'center', // Center content vertically
+    alignItems: 'center',
+    padding: 20,
+  },
+  inner: {
+    width: '100%',
+    maxWidth: 400, // Optional: Set a max width for better layout control
+    alignItems: 'center',
+  },
   logo: {
-    width: 400,
-    height: 400, // Adjust height according to the aspect ratio of your logo
-    marginBottom: 40, // Space between the logo and buttons
+    width: '100%',
+    height: 200, // Adjust the height of the logo
+    marginBottom: 20, // Space between the logo and the rest of the content
   },
   title: {
     fontSize: 24,
-    marginBottom: 20,
+    marginBottom: 10, // Space below the title
     textAlign: 'center',
   },
   input: {
@@ -99,7 +114,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 20,
+    marginBottom: 10, // Space between inputs
     paddingLeft: 10,
     borderRadius: 5,
     backgroundColor: 'white',
@@ -124,6 +139,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 1, // Shadow for Android
-  }
+  },
+  buttonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
-

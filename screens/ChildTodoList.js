@@ -30,7 +30,6 @@ const ChildTodoList = ({ username }) => {
 
       if (timeSnapshot.exists()) {
         const timeData = timeSnapshot.val();
-        console.log('Fetched availableTime:', timeData); // Log the fetched data
         const parsedTime = typeof timeData === 'string' ? parseInt(timeData, 10) : timeData;
         if (!isNaN(parsedTime)) {
           setAvailableTime(parsedTime);
@@ -105,7 +104,8 @@ const ChildTodoList = ({ username }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>To-Do List</Text>
-      <Text style={styles.availableTime}>Available Time: {availableTime} hours</Text>
+      <Text style={styles.availableTime}>Time Left: {Math.floor(availableTime)} hours {Math.floor((availableTime % 1) * 60)} minutes</Text>
+
       <FlatList
         data={tasks}
         keyExtractor={item => item.id}
