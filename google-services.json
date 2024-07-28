@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1046832296621",
+    "firebase_url": "https://gaurdianwings-6a603-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "gaurdianwings-6a603",
+    "storage_bucket": "gaurdianwings-6a603.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046832296621:android:3eb6dc45b355630cae8c24",
+        "android_client_info": {
+          "package_name": "com.GuardianWings"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1vx-oUZAXWNecuHMZzl8mJ1JvBvsWy5U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
