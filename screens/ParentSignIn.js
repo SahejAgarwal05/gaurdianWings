@@ -1,122 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import { ref, onValue, update, get } from 'firebase/database';
-import { db } from './firebaseConfig';
-import { PieChart } from 'react-native-chart-kit';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, Alert, Image, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { app, db } from './firebaseConfig.js';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { ref, get } from 'firebase/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ChildHome = ({ username }) => {
-  const [tasksCount, setTasksCount] = useState({ completed: 0, pending: 0 });
-  const [availableTime, setAvailableTime] = useState(0);
-  const navigation = useNavigation();
+const auth = getAuth(app);
+
+const ParentSignIn = ({ navigation }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const fetchTasksCount = () => {
-      const tasksRef = ref(db, `child/${username}/Tasks`);
-      onValue(tasksRef, (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          const completedTasks = Object.values(data).filter(task => task.status === 'Completed');
-          const completed = completedTasks.length;
-          const pending = Object.values(data).filter(task => task.status === 'Pending').length;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
 
-          const totalReward = completedTasks.reduce((total, task) => total + (parseFloat(task.reward) || 0), 0);
-          setTasksCount({ completed, pending });
+    return () => unsubscribe();
+  }, []);
 
-          const timeRef = ref(db, `child/${username}/`);
-          get(timeRef).then((snapshot) => {
-            if (snapshot.exists()) {
-              const currentAvailableTime = parseFloat(snapshot.val().availableTime) || 0;
-              const newAvailableTime = totalReward;
-              setAvailableTime(newAvailableTime);
-            } else {
-              setAvailableTime(totalReward);
-            }
-          });
+  const handleSignIn = async () => {
+    try {
+      const trimmedUsername = username.trim();
+      const trimmedPassword = password.trim();
+      const userRef = ref(db, `parent/${trimmedUsername}`);
+      const snapshot = await get(userRef);
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        if (userData.password === trimmedPassword) {
+          const userToSave = { username: trimmedUsername, type: 'parent' };
+          await AsyncStorage.setItem('user', JSON.stringify(userToSave));
+          navigation.navigate('ParentDashboard', { username: trimmedUsername, navigation: navigation });
+        } else {
+          Alert.alert('Error', 'Invalid password for Parent account.');
         }
-      }, (error) => {
-        console.error('Error fetching tasks:', error.message);
-      });
-    };
-
-    fetchTasksCount();
-  }, [username]);
-
-  const chartData = [
-    {
-      name: 'Completed',
-      count: tasksCount.completed,
-      color: '#00FF00',
-      legendFontColor: '#7F7F7F',
-      legendFontSize: 15,
-    },
-    {
-      name: 'Pending',
-      count: tasksCount.pending,
-      color: '#FF0000',
-      legendFontColor: '#7F7F7F',
-      legendFontSize: 15,
-    },
-  ];
+      } else {
+        Alert.alert('Error', 'Parent account not found.');
+      }
+    } catch (error) {
+      console.error('Error signing in:', error.message);
+      Alert.alert('Error', error.message);
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Task Progress</Text>
-      <PieChart
-        data={chartData}
-        width={Dimensions.get('window').width - 40}
-        height={220}
-        chartConfig={{
-          backgroundColor: '#1cc910',
-          backgroundGradientFrom: '#eff3ff',
-          backgroundGradientTo: '#efefef',
-          decimalPlaces: 2,
-          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
-        }}
-        accessor="count"
-        backgroundColor="transparent"
-        paddingLeft="15"
-        absolute
-      />
-      <View style={styles.screenTimeContainer}>
-        <Text style={styles.screenTimeTitle}>Total Time Earned Till Date</Text>
-        <Text style={styles.screenTimeValue}>{availableTime} hours</Text>
-      </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('Browser', { 'username': username })}
-      >
-        <Text style={styles.buttonText}>Go to Browser</Text>
-      </TouchableOpacity>
-    </View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.innerContainer}>
+        <View style={styles.inner}>
+          <Image
+            source={require('../images/GuardianWingslogo.png')}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>Parent Sign-In</Text>
+          <TextInput
+            style={styles.input}
+            value={username}
+            placeholder='Enter your username'
+            onChangeText={setUsername}
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+          />
+          <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
+
+export default ParentSignIn;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fefaf8',
+  },
+  innerContainer: {
+    flexGrow: 1,
+    justifyContent: 'center', // Center content vertically
+    alignItems: 'center',
+    padding: 20,
+  },
+  inner: {
+    width: '100%',
+    maxWidth: 400, // Optional: Set a max width for better layout control
+    alignItems: 'center',
+  },
+  logo: {
+    width: '100%',
+    height: 200, // Adjust the height of the logo
+    marginBottom: 20, // Space between the logo and the rest of the content
   },
   title: {
     fontSize: 24,
-    marginBottom: 20,
+    marginBottom: 10, // Space below the title
     textAlign: 'center',
   },
-  screenTimeContainer: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  screenTimeTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  screenTimeValue: {
-    fontSize: 18,
-    color: '#333',
+  input: {
+    width: '85%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10, // Space between inputs
+    paddingLeft: 10,
+    borderRadius: 5,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   button: {
     backgroundColor: '#ffffff', // White background to match the design
@@ -133,7 +138,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 1, // Shadow for Android
-    marginTop: 30, // Ensure there's spacing above the button
   },
   buttonText: {
     color: '#000',
@@ -141,5 +145,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-export default ChildHome;

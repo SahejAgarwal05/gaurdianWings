@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOp
 import { ref, push, onValue, update, remove } from 'firebase/database';
 import { db } from './firebaseConfig';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as WebBrowser from 'expo-web-browser'; // Import WebBrowser
 
 const ParentTodoList = ({ route }) => {
   const { parentUsername, childUsername } = route.params;
@@ -11,6 +12,8 @@ const ParentTodoList = ({ route }) => {
   const [deadline, setDeadline] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false); // State to toggle between tasks and history
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -31,7 +34,24 @@ const ParentTodoList = ({ route }) => {
       });
     };
 
+    const fetchHistory = () => {
+      const historyRef = ref(db, `child/${childUsername}/browsingHistory`);
+      onValue(historyRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const historyArray = Object.keys(data).map(key => ({
+            id: key,
+            ...data[key],
+          }));
+          setHistory(historyArray);
+        }
+      }, (error) => {
+        console.error('Error fetching history:', error.message);
+      });
+    };
+
     fetchTasks();
+    fetchHistory();
   }, [childUsername]);
 
   const handleAddTask = async () => {
@@ -44,7 +64,7 @@ const ParentTodoList = ({ route }) => {
         status: 'Pending',
       });
       setTask('');
-      setReward(0);
+      setReward('');
       setDeadline(new Date());
       Alert.alert('Success', 'Task added successfully!');
     } else {
@@ -76,7 +96,7 @@ const ParentTodoList = ({ route }) => {
     const taskRef = ref(db, `child/${childUsername}/Tasks/${taskId}`);
     await update(taskRef, { status: 'Completed' });
     const timeReward = tasks.find(task => task.id === taskId).reward;
-    const timeRef = ref(db, `chikd/${childUsername}/availableTime`);
+    const timeRef = ref(db, `child/${childUsername}/availableTime`);
     await update(timeRef, (time) => time + timeReward);
     setTasks(tasks.map(task => (task.id === taskId ? { ...task, status: 'Completed' } : task)));
     Alert.alert('Success', 'Task marked as completed!');
@@ -92,6 +112,10 @@ const ParentTodoList = ({ route }) => {
   const handleImagePress = (imageUrl) => {
     setSelectedImage(imageUrl);
     setModalVisible(true);
+  };
+
+  const openWebPage = async (url) => {
+    await WebBrowser.openBrowserAsync(url);
   };
 
   return (
@@ -123,44 +147,68 @@ const ParentTodoList = ({ route }) => {
       <TouchableOpacity style={styles.button} onPress={handleAddTask}>
         <Text style={styles.buttonText}>Add Task</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => setShowHistory(!showHistory)}>
+        <Text style={styles.buttonText}>{showHistory ? "Show Tasks" : "Show History"}</Text>
+      </TouchableOpacity>
 
-      <Text style={styles.subtitle}>Tasks</Text>
-      <FlatList
-        data={tasks}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.task}>
-            <Text>{item.task}</Text>
-            <Text>Deadline: {item.deadline}</Text>
-            <Text>Reward: {item.reward} hours</Text>
-            <Text>Status: {item.status}</Text>
-            <FlatList
-              data={item.imageUrls || []}
-              keyExtractor={(url, index) => index.toString()}
-              renderItem={({ item: url }) => (
-                <TouchableOpacity onPress={() => handleImagePress(url)}>
-                  <Image source={{ uri: url }} style={styles.image} />
-                </TouchableOpacity>
-              )}
-              horizontal
-            />
-            {(item.status === 'Pending' || item.status === 'Rejected') && (
-              <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.actionButton} onPress={() => handleVerifyTask(item.id)}>
-                  <Text style={styles.actionButtonText}>Accept</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={() => handleRejectTask(item.id)}>
-                  <Text style={styles.actionButtonText}>Reject</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={() => handleDeleteTask(item.id)}>
-                  <Text style={styles.actionButtonText}>Delete</Text>
-                </TouchableOpacity>
+      {/* Conditionally Render Tasks or History */}
+      {showHistory ? (
+        <>
+          <Text style={styles.subtitle}>History</Text>
+          <FlatList
+            data={history}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => openWebPage(item.url)}>
+                <View style={styles.historyItem}>
+                  <Text>{item.url}</Text>
+                  <Text>{item.timestamp}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </>
+      ) : (
+        <>
+          <Text style={styles.subtitle}>Tasks</Text>
+          <FlatList
+            data={tasks}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.task}>
+                <Text>{item.task}</Text>
+                <Text>Deadline: {item.deadline}</Text>
+                <Text>Reward: {item.reward} hours</Text>
+                <Text>Status: {item.status}</Text>
+                <FlatList
+                  data={item.imageUrls || []}
+                  keyExtractor={(url, index) => index.toString()}
+                  renderItem={({ item: url }) => (
+                    <TouchableOpacity onPress={() => handleImagePress(url)}>
+                      <Image source={{ uri: url }} style={styles.image} />
+                    </TouchableOpacity>
+                  )}
+                  horizontal
+                />
+                {(item.status === 'Pending' || item.status === 'Rejected') && (
+                  <View style={styles.buttonRow}>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => handleVerifyTask(item.id)}>
+                      <Text style={styles.actionButtonText}>Accept</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => handleRejectTask(item.id)}>
+                      <Text style={styles.actionButtonText}>Reject</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => handleDeleteTask(item.id)}>
+                      <Text style={styles.actionButtonText}>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
-          </View>
-        )}
-        contentContainerStyle={styles.scrollContent}
-      />
+            contentContainerStyle={styles.scrollContent}
+          />
+        </>
+      )}
 
       {selectedImage && (
         <Modal
@@ -185,42 +233,41 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
     flex: 1,
-    backgroundColor: '#fefaf8',
+    backgroundColor: '#f9f9f9',
   },
   title: {
     fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 20,
   },
   subtitle: {
-    fontSize: 20,
-    marginTop: 20,
-    marginBottom: 10,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginVertical: 10,
   },
   input: {
-    borderWidth: 1,
+    height: 40,
     borderColor: 'gray',
-    padding: 10,
-    marginBottom: 20,
-    borderRadius: 5,
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
   dateButton: {
-    borderWidth: 1,
-    borderColor: 'gray',
     padding: 10,
-    marginBottom: 20,
+    backgroundColor: '#4CAF50',
     borderRadius: 5,
     alignItems: 'center',
+    marginVertical: 10,
   },
   dateButtonText: {
-    fontSize: 16,
+    color: 'white',
   },
   button: {
     backgroundColor: '#4CAF50',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    padding: 10,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 10,
+    marginVertical: 10,
   },
   buttonText: {
     color: 'white',
@@ -232,6 +279,15 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+    backgroundColor: '#ffffff',
+  },
+  historyItem: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    backgroundColor: '#ffffff',
   },
   image: {
     width: 100,
