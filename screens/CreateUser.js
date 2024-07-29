@@ -150,7 +150,7 @@ const CreateUser = ({ navigation }) => {
         <Picker.Item label="Parent" value="Parent" />
         <Picker.Item label="Child" value="Child" />
       </Picker>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CreateUser')}>
+      <TouchableOpacity style={styles.button} onPress={handleCreateAccount}>
         <Text style={styles.buttonText}>Create Account</Text>
       </TouchableOpacity>
     </View>
@@ -220,3 +220,4 @@ const styles = StyleSheet.create({
     elevation: 1, // Shadow for Android
   },  
 });
+
