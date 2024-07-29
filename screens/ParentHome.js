@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { ref, onValue } from 'firebase/database';
+import { ref, onValue, off } from 'firebase/database';
 import { db } from './firebaseConfig';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -15,25 +15,26 @@ const ParentHome = ({ route, parentNavigation, parentUsername, navigation }) => 
       return;
     }
 
-    const fetchChildren = () => {
-      const userRef = ref(db, `parent/${parentUsername}/Children`);
-      onValue(userRef, (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          setChildren(Object.keys(data));
-          Object.keys(data).forEach(child => fetchTasksCount(child));
-        } else {
-          console.log('No children found for this parent.');
-        }
-      }, (error) => {
-        console.error('Error fetching children:', error.message);
-      });
+    const userRef = ref(db, `parent/${parentUsername}/Children`);
+
+    const handleValueChange = (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        setChildren(Object.keys(data));
+        Object.keys(data).forEach(child => fetchTasksCount(child));
+      } else {
+        setChildren([]);
+      }
     };
 
-    if (isFocused) {
-      fetchChildren();
-    }
-  }, [isFocused, parentUsername]);
+    onValue(userRef, handleValueChange, (error) => {
+      console.error('Error fetching children:', error.message);
+    });
+
+    return () => {
+      off(userRef, 'value', handleValueChange);
+    };
+  }, [parentUsername]);
 
   const fetchTasksCount = (childUsername) => {
     const tasksRef = ref(db, `child/${childUsername}/Tasks`);
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
   topContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    flex: 1, // Make sure topContent takes the full height
+    flex: 1,
   },
   section: {
     flex: 1,
