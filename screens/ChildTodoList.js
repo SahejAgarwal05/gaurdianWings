@@ -15,9 +15,7 @@ const ChildTodoList = ({ username }) => {
   useEffect(() => {
     const fetchTasksAndTime = async () => {
       const tasksRef = ref(db, `child/${username}/Tasks`);
-      const timeRef = ref(db, `child/${username}/availableTime`);
       const tasksSnapshot = await get(tasksRef);
-      const timeSnapshot = await get(timeRef);
 
       if (tasksSnapshot.exists()) {
         const data = tasksSnapshot.val();
@@ -26,16 +24,6 @@ const ChildTodoList = ({ username }) => {
           ...data[key],
         }));
         setTasks(tasksArray);
-      }
-
-      if (timeSnapshot.exists()) {
-        const timeData = timeSnapshot.val();
-        const parsedTime = typeof timeData === 'string' ? parseInt(timeData, 10) : timeData;
-        if (!isNaN(parsedTime)) {
-          setAvailableTime(parsedTime);
-        } else {
-          console.error('Expected availableTime to be a number');
-        }
       }
     };
 
@@ -53,6 +41,28 @@ const ChildTodoList = ({ username }) => {
 
     requestPermission();
   }, []);
+
+  useEffect(() => {
+    const fetchAvailableTime = async () => {
+      const timeRef = ref(db, `child/${username}/availableTime`);
+      const timeSnapshot = await get(timeRef);
+
+      if (timeSnapshot.exists()) {
+        const timeData = timeSnapshot.val();
+        const parsedTime = typeof timeData === 'string' ? parseInt(timeData, 10) : timeData;
+        if (!isNaN(parsedTime)) {
+          setAvailableTime(parsedTime);
+        } else {
+          console.error('Expected availableTime to be a number');
+        }
+      }
+    };
+
+    fetchAvailableTime();
+    const interval = setInterval(fetchAvailableTime, 1000);
+
+    return () => clearInterval(interval);
+  }, [username]);
 
   const handleUploadImage = async (taskId) => {
     if (hasPermission === null) {
