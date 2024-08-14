@@ -41,7 +41,6 @@ export default function Notifications(username) {
 
     initializeFCM();
 
-    // Handle incoming messages
     const unsubscribeOnMessage = messaging().onMessage(async (remoteMessage) => {
       Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
     });

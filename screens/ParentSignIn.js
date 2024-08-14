@@ -89,23 +89,23 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     flexGrow: 1,
-    justifyContent: 'center', // Center content vertically
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   inner: {
     width: '100%',
-    maxWidth: 400, // Optional: Set a max width for better layout control
+    maxWidth: 400, 
     alignItems: 'center',
   },
   logo: {
     width: '100%',
-    height: 200, // Adjust the height of the logo
-    marginBottom: 20, // Space between the logo and the rest of the content
+    height: 200, 
+    marginBottom: 20, 
   },
   title: {
     fontSize: 24,
-    marginBottom: 10, // Space below the title
+    marginBottom: 10, 
     textAlign: 'center',
   },
   input: {
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 10, // Space between inputs
+    marginBottom: 10, 
     paddingLeft: 10,
     borderRadius: 5,
     backgroundColor: 'white',
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   button: {
-    backgroundColor: '#ffffff', // White background to match the design
+    backgroundColor: '#ffffff', 
     paddingVertical: 10,
     paddingHorizontal: 25,
     borderRadius: 25,
@@ -132,12 +132,12 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '80%', // Width of the button
+    width: '80%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 1, // Shadow for Android
+    elevation: 1,
   },
   buttonText: {
     color: '#000',

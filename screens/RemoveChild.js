@@ -4,7 +4,7 @@ import { ref, get, set } from 'firebase/database';
 import { db } from './firebaseConfig';
 
 const RemoveChildScreen = ({ route, navigation }) => {
-  const parentUsername = route.params.username; // Get parent's username from navigation params
+  const parentUsername = route.params.username; 
   const [childUsername, setChildUsername] = useState('');
    const [parentPassword, setParentPassword] = useState('');
    console.log(parentUsername); 
@@ -18,7 +18,6 @@ const RemoveChildScreen = ({ route, navigation }) => {
     }
 
     try {
-      // Verify parent's password
       const parentRef = ref(db, `parent/${parentUsername}`);
       const parentSnapshot = await get(parentRef);
 
@@ -28,8 +27,6 @@ const RemoveChildScreen = ({ route, navigation }) => {
           Alert.alert('Error', 'Incorrect password for the parent account.');
           return;
         }
-
-        // Proceed to remove child
         const childRef = ref(db, `child/${trimmedChildUsername}`);
         const childSnapshot = await get(childRef);
 
@@ -37,11 +34,9 @@ const RemoveChildScreen = ({ route, navigation }) => {
           let childData = childSnapshot.val();
           
           if (childData.hasOwnProperty('parent') && childData.parent === parentUsername) {
-            // Remove parent field from child
             childData.parent = ' n ';
             await set(childRef, childData);
 
-            // Remove child from parent's children list
             const parentChildRef = ref(db, `parent/${parentUsername}/Children/${trimmedChildUsername}`);
             await set(parentChildRef, null);
 

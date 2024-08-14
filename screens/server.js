@@ -16,7 +16,6 @@ const sendNotification = (token, payload) => {
     });
 };
 
-// Example function to send a notification when a task is added
 const notifyTaskAdded = async (childUsername) => {
   const tokenRef = ref(db, `tokens/${childUsername}`);
   const tokenSnapshot = await get(tokenRef);

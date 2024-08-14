@@ -18,12 +18,7 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   return (
     <NavigationContainer>
-            <Stack.Navigator
-        initialRouteName="Home"
-        screenOptions={{
-          headerShown: false, // Hide header for all screens
-        }}
-      >
+        <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: false, }}>
         <Stack.Screen name="Welcome" component={HomeScreen} />
         <Stack.Screen name="ChildSignIn" component={ChildSignIn} />
         <Stack.Screen name="AddChildScreen" component={AddChildScreen} />

@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOp
 import { ref, push, onValue, update, remove } from 'firebase/database';
 import { db } from './firebaseConfig';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import * as WebBrowser from 'expo-web-browser'; // Import WebBrowser
+import * as WebBrowser from 'expo-web-browser';
 
 const ParentTodoList = ({ route }) => {
   const { parentUsername, childUsername } = route.params;
@@ -13,7 +13,7 @@ const ParentTodoList = ({ route }) => {
   const [showPicker, setShowPicker] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [history, setHistory] = useState([]);
-  const [showHistory, setShowHistory] = useState(false); // State to toggle between tasks and history
+  const [showHistory, setShowHistory] = useState(false); 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -60,7 +60,7 @@ const ParentTodoList = ({ route }) => {
       await push(tasksRef, {
         task,
         reward,
-        deadline: deadline.toISOString().split('T')[0], // Format the deadline as YYYY-MM-DD
+        deadline: deadline.toISOString().split('T')[0], 
         status: 'Pending',
       });
       setTask('');
@@ -73,11 +73,10 @@ const ParentTodoList = ({ route }) => {
   };
 
   const onChange = (event, selectedDate) => {
-    setShowPicker(false); // Close the picker after selecting a date
+    setShowPicker(false); 
     if (selectedDate) {
-      // Adjust the selected date to match the local timezone
       const localDate = new Date(selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000);
-      setDeadline(localDate); // Update the deadline state with the adjusted date
+      setDeadline(localDate);
     }
   };
 
@@ -150,8 +149,6 @@ const ParentTodoList = ({ route }) => {
       <TouchableOpacity style={styles.button} onPress={() => setShowHistory(!showHistory)}>
         <Text style={styles.buttonText}>{showHistory ? "Show Tasks" : "Show History"}</Text>
       </TouchableOpacity>
-
-      {/* Conditionally Render Tasks or History */}
       {showHistory ? (
         <>
           <Text style={styles.subtitle}>History</Text>

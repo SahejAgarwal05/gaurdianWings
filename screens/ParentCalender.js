@@ -38,7 +38,6 @@ const CalendarView = ({ parentUsername }) => {
     onValue(tasksRef, (snapshot) => {
       const newTasks = { ...tasks };
 
-      // Clear out old tasks for the child
       Object.keys(newTasks).forEach(date => {
         newTasks[date] = newTasks[date].filter(task => task.childUsername !== childUsername);
         if (newTasks[date].length === 0) delete newTasks[date];

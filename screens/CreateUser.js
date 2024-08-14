@@ -87,7 +87,7 @@ const CreateUser = ({ navigation }) => {
           email: trimmedEmail,
           password: trimmedPassword,
           parent: "",
-          availableTime: 0, // Initialize available time
+          availableTime: 0, 
         });
       }
 
@@ -169,8 +169,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 400,
-    height: 200, // Adjust height according to the aspect ratio of your logo
-    marginBottom: 60, // Space between the logo and buttons
+    height: 200, 
+    marginBottom: 60, 
     marginTop: 0,
   },
   title: {
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#ffffff', // White background to match the design
+    backgroundColor: '#ffffff',
     paddingVertical: 10,
     paddingHorizontal: 25,
     borderRadius: 25,
@@ -212,12 +212,12 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '80%', // Width of the button
+    width: '80%', 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 1, // Shadow for Android
+    elevation: 1, 
   },  
 });
 

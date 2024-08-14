@@ -119,7 +119,7 @@
      color: '#333',
    },
    button: {
-     backgroundColor: '#ffffff', // White background to match the design
+     backgroundColor: '#ffffff', 
      paddingVertical: 10,
      paddingHorizontal: 25,
      borderRadius: 25,
@@ -127,13 +127,13 @@
      borderColor: '#000',
      alignItems: 'center',
      justifyContent: 'center',
-     alignSelf: 'center', // Center button horizontally
-     marginTop: 30, // Ensure there's spacing above the button
+     alignSelf: 'center', 
+     marginTop: 30, 
      shadowColor: '#000',
      shadowOffset: { width: 0, height: 2 },
      shadowOpacity: 0.8,
      shadowRadius: 2,
-     elevation: 1, // Shadow for Android
+     elevation: 1, 
    },
    buttonText: {
      color: '#000',

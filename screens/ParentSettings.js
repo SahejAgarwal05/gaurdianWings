@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#ffffff', // White background
+    backgroundColor: '#ffffff', 
     paddingVertical: 10,
     paddingHorizontal: 25,
     borderRadius: 25,
@@ -82,12 +82,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-    width: '80%', // Width of the button
+    width: '80%', 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 1, // Shadow for Android
+    elevation: 1, 
   },
   buttonText: {
     color: '#000',

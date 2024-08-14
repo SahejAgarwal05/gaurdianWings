@@ -4,7 +4,7 @@ import { ref, set, get } from 'firebase/database';
 import { db } from './firebaseConfig';
 
 const AddChildScreen = ({ route, navigation }) => {
-  const { username: parentUsername } = route.params; // Get parent's username from navigation params
+  const { username: parentUsername } = route.params; 
   const [childUsername, setChildUsername] = useState('');
   const [childPassword, setChildPassword] = useState('');
 
@@ -37,10 +37,8 @@ const AddChildScreen = ({ route, navigation }) => {
           return;
         }
 
-        // Update child's parent field
         await set(ref(db, `child/${trimmedChildUsername}/parent`), parentUsername);
 
-        // Add child to parent's children list
         const parentChildRef = ref(db, `parent/${parentUsername}/Children/${trimmedChildUsername}`);
         await set(parentChildRef, true);
 

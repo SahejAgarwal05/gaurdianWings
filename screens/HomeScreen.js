@@ -45,17 +45,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#fefaf8', // Background color to match the design
+    backgroundColor: '#fefaf8', 
     paddingTop: 0,
   },
   logo: {
     width: 400,
-    height: 400, // Adjust height according to the aspect ratio of your logo
-    marginBottom: 60, // Space between the logo and buttons
+    height: 400, 
+    marginBottom: 60, 
     marginTop: 0,
   },
   button: {
-    backgroundColor: '#ffffff', // White background to match the design
+    backgroundColor: '#ffffff', 
     paddingVertical: 10,
     paddingHorizontal: 25,
     borderRadius: 25,
@@ -68,13 +68,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 1, // Shadow for Android
+    elevation: 1,
   },
   buttonText: {
     color: '#000',
     fontSize: 16,
   },
   spacer: {
-    height: 20, // Space between buttons
+    height: 20, 
   },
 });
